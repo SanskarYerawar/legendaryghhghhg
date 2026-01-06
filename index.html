@@ -13,14 +13,18 @@
     <style>
         /* === THEME VARIABLES === */
         :root {
-            --app-bg: #f2f4f8; --card-bg: #ffffff; --text-main: #000000;
-            --text-sub: #6c757d; --input-bg: #f8f9fa; --input-border: #eee;
+            --app-bg: #f0f2f5; --card-bg: #ffffff; --text-main: #000000;
+            --text-sub: #6c757d; --input-bg: #f8f9fa; --input-border: #e9ecef;
             --nav-bg: #ffffff;
+            --udhaar-bg: #fff5f5; --udhaar-text: #dc3545;
+            --paid-bg: #ffffff; --paid-text: #198754;
         }
         [data-bs-theme="dark"] {
             --app-bg: #121212; --card-bg: #1e1e1e; --text-main: #e0e0e0;
             --text-sub: #adb5bd; --input-bg: #2c2c2c; --input-border: #444;
             --nav-bg: #1e1e1e;
+            --udhaar-bg: #2c0b0e; --udhaar-text: #ff6b6b;
+            --paid-bg: #1e1e1e; --paid-text: #2ecc71;
         }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; }
@@ -32,6 +36,12 @@
         }
         .hidden { display: none !important; }
 
+        /* HEADER */
+        .app-header {
+            background: var(--nav-bg); padding: 10px 15px; position: sticky; top: 0; z-index: 1020; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+
         /* LOADING POPUP */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -40,19 +50,13 @@
             color: white; text-align: center; backdrop-filter: blur(4px);
         }
 
-        /* HEADER */
-        .app-header {
-            background: var(--nav-bg); padding: 10px 15px; position: sticky; top: 0; z-index: 1020; 
-            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-        }
-
         /* CARDS & INPUTS */
         .app-card {
             background: var(--card-bg); border-radius: 16px; padding: 15px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 10px; border: 1px solid var(--input-border);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); margin-bottom: 10px; border: 1px solid var(--input-border);
         }
         .form-control, .form-select { 
-            border-radius: 10px; background: var(--input-bg); border: 1px solid var(--input-border); 
+            border-radius: 12px; background: var(--input-bg); border: 1px solid var(--input-border); 
             color: var(--text-main); padding: 12px; font-size: 16px; 
         }
         .form-control:focus { background: var(--card-bg); border-color: #0d6efd; box-shadow: none; color: var(--text-main); }
@@ -67,13 +71,33 @@
         .receipt-table th { border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 0.75rem; color: #666; }
         .receipt-table td { padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; vertical-align: middle; }
 
+        /* HISTORY CARD DESIGN (TOUCH OPTIMIZED) */
+        .history-card {
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-left: 5px solid transparent;
+        }
+        .history-card.is-udhaar { border-left-color: #dc3545; background: var(--udhaar-bg); }
+        .history-card.is-paid { border-left-color: #198754; background: var(--paid-bg); }
+        
+        .filter-btn {
+            border-radius: 20px; border: 1px solid var(--input-border); 
+            background: var(--card-bg); color: var(--text-sub);
+            padding: 8px 16px; font-weight: 600; font-size: 0.85rem;
+            flex: 1; transition: all 0.2s;
+        }
+        .filter-btn.active { background: #0d6efd; color: white; border-color: #0d6efd; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); }
+
         /* BOTTOM NAV */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); height: 65px;
             display: flex; justify-content: space-around; align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1030;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1030;
             border-top-left-radius: 15px; border-top-right-radius: 15px;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s;
         }
         .nav-item-btn { border: none; background: none; display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 0.7rem; font-weight: 600; padding: 8px; flex: 1; }
         .nav-item-btn.active { color: #0d6efd; }
@@ -86,22 +110,14 @@
         }
         .action-btn-container { 
             pointer-events: auto; background: var(--nav-bg); padding: 8px; border-radius: 14px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; gap: 10px; border: 1px solid var(--input-border);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; gap: 10px; border: 1px solid var(--input-border);
         }
         .btn-success-app { 
             background: #25D366; border: none; font-weight: 700; color: white;
             padding: 12px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); border-radius: 12px;
         }
-
-        /* UDHAAR HISTORY ITEM */
-        .history-item {
-            background: var(--card-bg); border-bottom: 1px solid var(--input-border);
-            padding: 12px;
-        }
-        .badge-udhaar { background: #fee2e2; color: #dc3545; border: 1px solid #fecaca; }
-        .badge-paid { background: #d1e7dd; color: #198754; border: 1px solid #badbcc; }
         
-        .btn:active, .nav-item-btn:active { transform: scale(0.96); }
+        .btn:active, .nav-item-btn:active, .history-card:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -146,12 +162,8 @@
     <div id="billing-view" class="hidden">
         <div class="app-card mb-3">
             <div class="row g-2 mb-2">
-                <div class="col-7">
-                    <input type="text" id="custName" class="form-control fw-bold" placeholder="Name" oninput="updateBillPreview()">
-                </div>
-                <div class="col-5">
-                    <input type="tel" id="custPhone" class="form-control" placeholder="Mobile" maxlength="10">
-                </div>
+                <div class="col-7"><input type="text" id="custName" class="form-control fw-bold" placeholder="Name" oninput="updateBillPreview()"></div>
+                <div class="col-5"><input type="tel" id="custPhone" class="form-control" placeholder="Mobile" maxlength="10"></div>
             </div>
             
             <select id="paymentMode" class="form-select fw-bold mb-3 text-secondary" onchange="updateBillPreview()">
@@ -161,21 +173,13 @@
             </select>
 
             <div class="row g-2">
-                <div class="col-4">
-                    <input type="number" id="boxBarcode" class="form-control text-center fw-bold text-primary" placeholder="Code" oninput="checkDatabase()">
-                </div>
-                <div class="col-8">
-                    <input type="text" id="boxName" class="form-control" placeholder="Item Name">
-                </div>
-                <div class="col-6">
-                    <input type="number" id="boxPrice" class="form-control" placeholder="Price">
-                </div>
+                <div class="col-4"><input type="number" id="boxBarcode" class="form-control text-center fw-bold text-primary" placeholder="Code" oninput="checkDatabase()"></div>
+                <div class="col-8"><input type="text" id="boxName" class="form-control" placeholder="Item Name"></div>
+                <div class="col-6"><input type="number" id="boxPrice" class="form-control" placeholder="Price"></div>
                 <div class="col-6">
                     <div class="d-flex gap-2">
                         <input type="number" id="boxQty" class="form-control" value="1" placeholder="Qty">
-                        <button class="btn btn-primary rounded-3 px-3 w-50 shadow-sm" onclick="addToBill()">
-                            <i class="bi bi-plus-lg fs-4"></i>
-                        </button>
+                        <button class="btn btn-primary rounded-3 px-3 w-50 shadow-sm" onclick="addToBill()"><i class="bi bi-plus-lg fs-4"></i></button>
                     </div>
                 </div>
             </div>
@@ -208,28 +212,13 @@
                 </div>
             </div>
             <table class="w-100 receipt-table">
-                <thead>
-                    <tr>
-                        <th data-key="th_item" style="width: 50%;">ITEM</th>
-                        <th class="text-center" data-key="th_qty">QTY</th>
-                        <th class="text-end" data-key="th_amt">AMT</th>
-                        <th class="action-col" style="width: 30px;"></th>
-                    </tr>
-                </thead>
+                <thead><tr><th data-key="th_item" style="width: 50%;">ITEM</th><th class="text-center" data-key="th_qty">QTY</th><th class="text-end" data-key="th_amt">AMT</th><th class="action-col" style="width: 30px;"></th></tr></thead>
                 <tbody id="bill-table-body"></tbody>
             </table>
-            
             <div style="border-top: 2px dashed #000; margin: 15px 0;"></div>
-            
-            <div class="d-flex justify-content-between small text-muted">
-                <span data-key="lbl_subtotal">Subtotal:</span><span>₹<span id="bill-subtotal">0</span></span>
-            </div>
-            <div id="row-discount" class="d-flex justify-content-between small text-danger hidden">
-                <span data-key="lbl_discount">Discount:</span><span>-₹<span id="bill-disc-display">0</span></span>
-            </div>
-            <div class="d-flex justify-content-between fw-bold fs-4 mt-2">
-                <span data-key="total">TOTAL:</span><span>₹<span id="bill-total">0</span></span>
-            </div>
+            <div class="d-flex justify-content-between small text-muted"><span data-key="lbl_subtotal">Subtotal:</span><span>₹<span id="bill-subtotal">0</span></span></div>
+            <div id="row-discount" class="d-flex justify-content-between small text-danger hidden"><span data-key="lbl_discount">Discount:</span><span>-₹<span id="bill-disc-display">0</span></span></div>
+            <div class="d-flex justify-content-between fw-bold fs-4 mt-2"><span data-key="total">TOTAL:</span><span>₹<span id="bill-total">0</span></span></div>
             <div class="text-center mt-4 small text-muted" style="font-size: 0.75rem;" data-key="footer_msg">Thank You! Visit Again.</div>
         </div>
     </div>
@@ -240,28 +229,31 @@
             <div class="row g-2">
                 <div class="col-8"><input type="text" id="invName" class="form-control" placeholder="Item Name"></div>
                 <div class="col-4"><input type="text" id="invBarcode" class="form-control" placeholder="Code"></div>
-                <div class="col-12">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0">₹</span>
-                        <input type="number" id="invPrice" class="form-control border-start-0" placeholder="Price">
-                        <button class="btn btn-dark fw-bold px-4" onclick="saveToDB()" data-key="btn_save_prod">Save</button>
-                    </div>
-                </div>
+                <div class="col-12"><div class="input-group"><span class="input-group-text bg-light border-end-0">₹</span><input type="number" id="invPrice" class="form-control border-start-0" placeholder="Price"><button class="btn btn-dark fw-bold px-4" onclick="saveToDB()" data-key="btn_save_prod">Save</button></div></div>
             </div>
         </div>
-        <input type="text" id="dbSearch" class="form-control mb-3 py-3 rounded-3 shadow-sm border-0" placeholder="Search products..." oninput="renderDB()">
+        <input type="text" id="dbSearch" class="form-control mb-3 py-3 rounded-3 shadow-sm border-0" placeholder="Search..." oninput="renderDB()">
         <div id="db-list" class="pb-5"></div>
     </div>
 
     <div id="history-view" class="hidden">
-        <h5 class="mb-3 ps-2 fw-bold" data-key="title_history">Sales History</h5>
+        <div class="d-flex justify-content-between align-items-end mb-2 px-1">
+            <h5 class="fw-bold mb-0" data-key="title_history">History</h5>
+            <small class="text-danger fw-bold" id="hist-total-pending">Pending: ₹0</small>
+        </div>
+
+        <div class="d-flex gap-2 mb-3">
+            <button class="filter-btn active" onclick="setHistFilter('all')" id="fil-all" data-key="filter_all">ALL</button>
+            <button class="filter-btn" onclick="setHistFilter('pending')" id="fil-pending" data-key="filter_pending">PENDING</button>
+            <button class="filter-btn" onclick="setHistFilter('paid')" id="fil-paid" data-key="filter_paid">PAID</button>
+        </div>
         
         <div class="input-group mb-3 shadow-sm rounded-3">
             <span class="input-group-text border-0 bg-white"><i class="bi bi-search"></i></span>
-            <input type="text" id="histSearch" class="form-control border-0 p-3" placeholder="Search Name or Date..." oninput="renderHistory()">
+            <input type="text" id="histSearch" class="form-control border-0 p-3" placeholder="Search Name..." oninput="renderHistory()">
         </div>
 
-        <ul id="history-list" class="list-group list-group-flush rounded-3 shadow-sm"></ul>
+        <div id="history-list" class="pb-5"></div>
     </div>
 
 </div>
@@ -270,8 +262,7 @@
     <div class="action-btn-container">
         <button class="btn btn-light text-danger border rounded-3 px-3" onclick="clearBill()"><i class="bi bi-trash3-fill fs-4"></i></button>
         <button class="btn btn-success-app flex-grow-1" onclick="saveAndShare()">
-            <i class="bi bi-whatsapp me-2 fs-4" style="vertical-align: middle;"></i> 
-            <span style="vertical-align: middle;" data-key="btn_save_share">Save & Share</span>
+            <i class="bi bi-whatsapp me-2 fs-4" style="vertical-align: middle;"></i> <span style="vertical-align: middle;" data-key="btn_save_share">Save & Share</span>
         </button>
     </div>
 </div>
@@ -284,10 +275,8 @@
 </div>
 
 <script>
-    // --- VIBRATION HELPER ---
     function buzz() { if(navigator.vibrate) navigator.vibrate(50); }
 
-    // --- LANG & TRANSLATIONS ---
     let currentLang = 'en';
     const t = {
         en: {
@@ -299,7 +288,7 @@
             shop_name: "TIRUPATI COLLECTION", shop_addr: "Old Bus Stand, Dhanki", footer_msg: "Thank You! Visit Again.",
             th_item: "ITEM", th_qty: "QTY", th_amt: "AMT", total: "TOTAL", lbl_subtotal: "Subtotal:", lbl_discount: "Discount:",
             opt_cash: "Cash", opt_online: "Online", opt_udhaar: "Udhaar",
-            title_history: "Sales History", data_safe: "Data Safety",
+            title_history: "Sales History", data_safe: "Data Safety", filter_all: "ALL", filter_pending: "PENDING", filter_paid: "PAID",
             pop_gen: "Generating Bill...", sys_pop: "✅ BILL COPIED!\n\n1. WhatsApp will open.\n2. Long Press & PASTE.",
             pop_copy: "Bill Copied!", pop_redir: "Opening WhatsApp..."
         },
@@ -312,20 +301,16 @@
             shop_name: "तिरुपती कलेक्शन", shop_addr: "जुने बस स्टँड, ढाणकी", footer_msg: "धन्यवाद! पुन्हा भेट द्या.",
             th_item: "वस्तू", th_qty: "नग", th_amt: "रक्कम", total: "एकूण", lbl_subtotal: "उप-एकूण:", lbl_discount: "सवलत:",
             opt_cash: "रोख (Cash)", opt_online: "ऑनलाईन", opt_udhaar: "उधारी",
-            title_history: "विक्री इतिहास", data_safe: "डेटा सुरक्षा",
+            title_history: "विक्री इतिहास", data_safe: "डेटा सुरक्षा", filter_all: "सर्व", filter_pending: "बाकी (उधारी)", filter_paid: "जमा",
             pop_gen: "बिल बनवत आहे...", sys_pop: "✅ बिल कॉपी झाले!\n\n1. WhatsApp उघडेल.\n2. तिथे पेस्ट (Paste) करा.",
             pop_copy: "बिल कॉपी झाले!", pop_redir: "WhatsApp उघडत आहे..."
         }
     };
 
     function toggleLanguage() {
-        buzz();
-        currentLang = currentLang === 'en' ? 'mr' : 'en';
+        buzz(); currentLang = currentLang === 'en' ? 'mr' : 'en';
         document.getElementById('lang-text').innerText = currentLang === 'en' ? "A/अ" : "Eng";
-        document.querySelectorAll("[data-key]").forEach(el => {
-            let k = el.getAttribute("data-key");
-            if(t[currentLang][k]) el.innerText = t[currentLang][k];
-        });
+        document.querySelectorAll("[data-key]").forEach(el => { let k = el.getAttribute("data-key"); if(t[currentLang][k]) el.innerText = t[currentLang][k]; });
         document.getElementById("custName").placeholder = t[currentLang]["ph_cust"];
         document.getElementById("boxName").placeholder = t[currentLang]["lbl_item"];
         document.getElementById("boxPrice").placeholder = t[currentLang]["lbl_price"];
@@ -333,25 +318,20 @@
         renderBill(); renderDB(); renderHistory();
     }
     function toggleTheme() {
-        buzz();
-        let html = document.documentElement;
-        let isDark = html.getAttribute('data-bs-theme') === 'dark';
+        buzz(); let html = document.documentElement; let isDark = html.getAttribute('data-bs-theme') === 'dark';
         html.setAttribute('data-bs-theme', isDark ? 'light' : 'dark');
         document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#f2f4f8' : '#121212');
     }
 
-    // --- LOGIC ---
+    // --- CORE LOGIC ---
     function getDB() { return JSON.parse(localStorage.getItem("shopDB")) || []; }
     function saveToDB() {
-        buzz();
-        let c = document.getElementById("invBarcode").value, n = document.getElementById("invName").value, p = document.getElementById("invPrice").value;
+        buzz(); let c = document.getElementById("invBarcode").value, n = document.getElementById("invName").value, p = document.getElementById("invPrice").value;
         if(!n) return alert("Name Required!");
         let db = getDB(), idx = db.findIndex(x => x.code == c && c != "");
-        // STOCK REMOVED - Defaulting to 100 for legacy compatibility
         let item = { code: c || "NOCODE", name: n, price: p, stock: 100 };
         if(idx > -1) db[idx] = item; else db.push(item);
-        localStorage.setItem("shopDB", JSON.stringify(db));
-        renderDB(); alert(currentLang === 'en' ? "Saved!" : "सेव्ह झाले!");
+        localStorage.setItem("shopDB", JSON.stringify(db)); renderDB(); alert(currentLang === 'en' ? "Saved!" : "सेव्ह झाले!");
         document.getElementById("invBarcode").value=""; document.getElementById("invName").value="";
     }
     function renderDB() {
@@ -362,10 +342,7 @@
                 list.innerHTML += `
                 <div class="app-card p-3 mb-2 d-flex justify-content-between align-items-center">
                     <div><div class="fw-bold">${item.name}</div><span class="small text-muted">${item.code}</span></div>
-                    <div class="text-end">
-                        <div class="fw-bold text-success fs-5">₹${item.price}</div>
-                        <small class="text-primary fw-bold cursor-pointer" onclick="editItem(${index})">EDIT</small>
-                    </div>
+                    <div class="text-end"><div class="fw-bold text-success fs-5">₹${item.price}</div><small class="text-primary fw-bold cursor-pointer" onclick="editItem(${index})">EDIT</small></div>
                 </div>`;
             }
         });
@@ -378,36 +355,26 @@
         if(p) { document.getElementById("boxName").value = p.name; document.getElementById("boxPrice").value = p.price; }
     }
     function addToBill() {
-        buzz();
-        let n = document.getElementById("boxName").value;
-        let p = parseFloat(document.getElementById("boxPrice").value);
-        let q = parseInt(document.getElementById("boxQty").value);
+        buzz(); let n = document.getElementById("boxName").value, p = parseFloat(document.getElementById("boxPrice").value), q = parseInt(document.getElementById("boxQty").value);
         if(!n || isNaN(p) || isNaN(q)) { document.getElementById("boxName").focus(); return; }
         currentBill.push({ name: n, price: p, qty: q, total: p*q });
         renderBill();
-        document.getElementById("boxName").value=""; document.getElementById("boxPrice").value=""; 
-        document.getElementById("boxBarcode").value=""; document.getElementById("boxQty").value="1";
+        document.getElementById("boxName").value=""; document.getElementById("boxPrice").value=""; document.getElementById("boxBarcode").value=""; document.getElementById("boxQty").value="1";
         document.getElementById("boxBarcode").focus();
     }
     function renderBill() {
-        let tbody = document.getElementById("bill-table-body"), sub = 0;
-        tbody.innerHTML = "";
+        let tbody = document.getElementById("bill-table-body"), sub = 0; tbody.innerHTML = "";
         document.getElementById("receipt-cust-name").innerText = document.getElementById("custName").value;
         let modeKey = 'opt_' + document.getElementById("paymentMode").value.toLowerCase();
         document.getElementById("pay-mode-badge").innerText = (t[currentLang][modeKey] || "CASH").toUpperCase();
-
         currentBill.forEach((i, idx) => {
             sub += i.total;
             tbody.innerHTML += `<tr><td class="py-2">${i.name}</td><td class="text-center">${i.qty}</td><td class="text-end">₹${i.total}</td><td class="action-col text-end"><i class="bi bi-x-circle-fill text-danger fs-4" onclick="remItem(${idx})"></i></td></tr>`;
         });
-        
         let discInput = parseFloat(document.getElementById("discountVal").value) || 0;
         let type = document.getElementById("discountType").value;
         let discAmt = type === 'flat' ? discInput : Math.round((sub * discInput) / 100);
-        
-        document.getElementById("bill-subtotal").innerText = sub;
-        document.getElementById("bill-total").innerText = sub - discAmt;
-        document.getElementById("bill-disc-display").innerText = discAmt;
+        document.getElementById("bill-subtotal").innerText = sub; document.getElementById("bill-total").innerText = sub - discAmt; document.getElementById("bill-disc-display").innerText = discAmt;
         document.getElementById("row-discount").classList.toggle("hidden", !document.getElementById("showDiscountToggle").checked);
     }
     function remItem(i) { currentBill.splice(i,1); renderBill(); }
@@ -415,35 +382,19 @@
 
     // --- SHARE LOGIC ---
     async function saveAndShare() {
-        buzz();
-        if(!currentBill.length) return alert("Bill Empty!");
-        
+        buzz(); if(!currentBill.length) return alert("Bill Empty!");
         let h = JSON.parse(localStorage.getItem("billHistory")) || [];
         let finalAmt = parseFloat(document.getElementById("bill-total").innerText) || 0;
         let custName = document.getElementById("custName").value || "Customer";
         let custPhone = document.getElementById("custPhone").value.replace(/\D/g, "") || ""; 
         let mode = document.getElementById("paymentMode").value;
-
-        // Pending Amount Logic (If Udhaar, pending = full amt, else 0)
         let pendingAmt = mode === 'Udhaar' ? finalAmt : 0;
         
-        h.push({ 
-            id: Date.now(),
-            date: new Date().toLocaleDateString(), 
-            cust: custName, 
-            phone: custPhone, 
-            amt: finalAmt, 
-            mode: mode,
-            pending: pendingAmt 
-        });
-        
-        localStorage.setItem("billHistory", JSON.stringify(h));
-        calculateStats();
+        h.push({ id: Date.now(), date: new Date().toLocaleDateString(), cust: custName, phone: custPhone, amt: finalAmt, mode: mode, pending: pendingAmt });
+        localStorage.setItem("billHistory", JSON.stringify(h)); calculateStats();
 
         let overlay = document.getElementById("loadingOverlay"), title = document.getElementById("popupTitle");
-        overlay.classList.remove("hidden");
-        title.innerText = t[currentLang]["pop_gen"];
-
+        overlay.classList.remove("hidden"); title.innerText = t[currentLang]["pop_gen"];
         document.querySelectorAll('.action-col').forEach(e => e.style.display='none');
         setTimeout(async () => {
             try {
@@ -452,142 +403,109 @@
                     let msgText = currentLang === 'mr' ? `नमस्कार ${custName}, तुमचे ₹${finalAmt} चे बिल तयार आहे. - तिरुपती कलेक्शन` : `Hello ${custName}, here is your bill of ₹${finalAmt} from Tirupati Collection.`;
                     let msg = encodeURIComponent(msgText);
                     let isCopied = false;
-
                     try {
                         if (navigator.permissions) try { await navigator.permissions.query({name: "clipboard-write"}); } catch(e){}
                         await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-                        isCopied = true;
-                        title.innerText = t[currentLang]["pop_copy"];
+                        isCopied = true; title.innerText = t[currentLang]["pop_copy"];
                     } catch (err) {
-                        isCopied = false;
-                        let link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Bill_${custName}.png`; link.click();
+                        isCopied = false; let link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Bill_${custName}.png`; link.click();
                         title.innerText = "⚠️ Android Blocked Copy";
                     }
-
                     setTimeout(() => {
                         overlay.classList.add("hidden");
                         if(custPhone) {
                             if(isCopied) alert(t[currentLang]["sys_pop"]); else alert("Image Downloaded. Attach in WhatsApp.");
                             window.location.href = `https://wa.me/91${custPhone}?text=${msg}`;
                         } else if(navigator.share) {
-                             let file = new File([blob], "bill.png", {type:"image/png"});
-                             navigator.share({files:[file], title:"Bill"});
-                        } else {
-                            alert("Saved!");
-                        }
-                        clearBillUI();
-                        document.querySelectorAll('.action-col').forEach(e => e.style.display='table-cell');
+                             let file = new File([blob], "bill.png", {type:"image/png"}); navigator.share({files:[file], title:"Bill"});
+                        } else { alert("Saved!"); }
+                        clearBillUI(); document.querySelectorAll('.action-col').forEach(e => e.style.display='table-cell');
                     }, 1500);
                 }, 'image/png');
             } catch(e) { overlay.classList.add("hidden"); alert("Error: "+e.message); document.querySelectorAll('.action-col').forEach(e => e.style.display='table-cell'); }
         }, 100);
     }
-
     function clearBill() { if(confirm("Delete bill?")) clearBillUI(); }
     function clearBillUI() { currentBill = []; document.getElementById("custName").value = ""; document.getElementById("custPhone").value = ""; document.getElementById("discountVal").value = ""; renderBill(); }
 
     function calculateStats() {
         let h = JSON.parse(localStorage.getItem("billHistory")) || [], today = new Date().toLocaleDateString();
-        // Today Sale = Sum of 'amt' for today
         document.getElementById("stat-today").innerText = h.filter(x => x.date === today).reduce((a, b) => a + (parseFloat(b.amt) || 0), 0);
-        // Pending = Sum of 'pending' (Using new field for accuracy)
         let totalPending = h.reduce((a, b) => a + (parseFloat(b.pending) || (b.mode === 'Udhaar' ? parseFloat(b.amt) : 0)), 0);
         document.getElementById("stat-pending").innerText = totalPending;
+        document.getElementById("hist-total-pending").innerText = `Pending: ₹${totalPending}`;
     }
-    
-    // SMART HISTORY
+
+    // --- NEW HISTORY LOGIC ---
+    let histFilter = 'all';
+    function setHistFilter(f) {
+        histFilter = f;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('fil-'+f).classList.add('active');
+        renderHistory();
+    }
     function renderHistory() {
         let l = document.getElementById("history-list"), h = JSON.parse(localStorage.getItem("billHistory"))||[];
         let search = document.getElementById("histSearch").value.toLowerCase();
         l.innerHTML = "";
         
         h.slice().reverse().forEach((x, index) => {
-            // Filter Logic
-            if(search && !x.cust.toLowerCase().includes(search) && !x.date.includes(search)) return;
-
-            let realIndex = h.length - 1 - index; // Correct index for reverse list
+            // Smart Filter
             let pending = parseFloat(x.pending) || (x.mode === 'Udhaar' ? parseFloat(x.amt) : 0);
             let isPaid = pending <= 0;
-            let statusBadge = isPaid ? `<span class="badge badge-paid">PAID</span>` : `<span class="badge badge-udhaar">PENDING ₹${pending}</span>`;
-            let phoneLink = x.phone ? `<a href="tel:${x.phone}" class="text-decoration-none small text-muted ms-2"><i class="bi bi-telephone-fill"></i></a>` : '';
             
-            // PAY BUTTON (Only if Pending > 0)
-            let payBtn = !isPaid ? `<button class="btn btn-sm btn-outline-success ms-2 fw-bold" onclick="settleBill(${realIndex})">PAY</button>` : '';
+            // 1. Check Search
+            if(search && !x.cust.toLowerCase().includes(search) && !x.date.includes(search)) return;
+            // 2. Check Filter Button
+            if(histFilter === 'pending' && isPaid) return;
+            if(histFilter === 'paid' && !isPaid) return;
+
+            let realIndex = h.length - 1 - index;
+            let statusClass = isPaid ? 'is-paid' : 'is-udhaar';
+            let statusText = isPaid ? `<span class="text-success fw-bold">PAID</span>` : `<span class="text-danger fw-bold">PENDING ₹${pending}</span>`;
+            let payBtn = !isPaid ? `<button class="btn btn-sm btn-outline-success px-3 fw-bold rounded-pill" onclick="settleBill(${realIndex})">PAY</button>` : '';
+            let phoneLink = x.phone ? `<a href="tel:${x.phone}" class="text-secondary ms-2"><i class="bi bi-telephone-fill"></i></a>` : '';
 
             l.innerHTML += `
-            <div class="history-item d-flex justify-content-between align-items-center">
+            <div class="history-card ${statusClass} d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="fw-bold">${x.cust || 'Unknown'} ${phoneLink}</div>
-                    <small style="color: var(--text-sub)">${x.date} • ₹${x.amt}</small>
-                    <div class="mt-1">${statusBadge}</div>
+                    <div class="fw-bold fs-5">${x.cust || 'Unknown'} ${phoneLink}</div>
+                    <div class="small text-muted mb-1">${x.date} • Total: ₹${x.amt}</div>
+                    <div>${statusText}</div>
                 </div>
-                <div class="d-flex align-items-center">
-                    ${payBtn}
-                </div>
+                <div>${payBtn}</div>
             </div>`;
         });
     }
 
-    // SETTLE UDHAAR
     function settleBill(index) {
-        buzz();
-        let h = JSON.parse(localStorage.getItem("billHistory"));
-        let item = h[index];
+        buzz(); let h = JSON.parse(localStorage.getItem("billHistory")); let item = h[index];
         let currentPending = parseFloat(item.pending) || parseFloat(item.amt);
-        
         let payAmt = prompt(`Pending: ₹${currentPending}\nEnter Amount Received:`, currentPending);
         if(payAmt === null) return;
-        
         let payVal = parseFloat(payAmt);
         if(isNaN(payVal) || payVal <= 0) return alert("Invalid Amount");
-        
-        // Update Pending
-        item.pending = currentPending - payVal;
-        if(item.pending < 0) item.pending = 0;
-        
-        // Update Mode if fully paid
+        item.pending = currentPending - payVal; if(item.pending < 0) item.pending = 0;
         if(item.pending === 0) item.mode = 'Cash'; 
-        
-        h[index] = item;
-        localStorage.setItem("billHistory", JSON.stringify(h));
+        h[index] = item; localStorage.setItem("billHistory", JSON.stringify(h));
         calculateStats(); renderHistory();
     }
     
-    function editItem(i) {
-        let item = getDB()[i]; document.getElementById("invBarcode").value = item.code; document.getElementById("invName").value = item.name;
-        document.getElementById("invPrice").value = item.price; 
-        window.scrollTo(0,0); switchTab('stock');
-    }
+    function editItem(i) { let item = getDB()[i]; document.getElementById("invBarcode").value = item.code; document.getElementById("invName").value = item.name; document.getElementById("invPrice").value = item.price; window.scrollTo(0,0); switchTab('stock'); }
     function switchTab(t) {
-        buzz();
-        document.querySelectorAll('[id$="-view"]').forEach(e => e.classList.add('hidden')); document.getElementById(t+"-view").classList.remove('hidden');
+        buzz(); document.querySelectorAll('[id$="-view"]').forEach(e => e.classList.add('hidden')); document.getElementById(t+"-view").classList.remove('hidden');
         document.querySelectorAll('.nav-item-btn').forEach(e => e.classList.remove('active')); document.getElementById("nav-"+t).classList.add('active');
         if(t === 'billing') document.getElementById('billing-actions').classList.remove('hidden'); else document.getElementById('billing-actions').classList.add('hidden');
         if(t==='stock') renderDB(); if(t==='history') renderHistory(); if(t==='dashboard') calculateStats();
     }
     
-    // KEYBOARD HANDLING
-    const originalHeight = window.innerHeight;
     window.addEventListener('resize', () => {
-        if(window.innerHeight < originalHeight - 150) {
-            document.querySelector('.bottom-nav').style.transform = 'translateY(100%)';
-            document.querySelector('.sticky-action-bar').style.transform = 'translateY(200%)';
-        } else {
-            document.querySelector('.bottom-nav').style.transform = 'translateY(0)';
-            if(document.getElementById("nav-billing").classList.contains('active')) document.querySelector('.sticky-action-bar').style.transform = 'translateY(0)';
-        }
+        if(window.innerHeight < 600) { document.querySelector('.bottom-nav').style.transform = 'translateY(100%)'; document.querySelector('.sticky-action-bar').style.transform = 'translateY(200%)'; } 
+        else { document.querySelector('.bottom-nav').style.transform = 'translateY(0)'; if(document.getElementById("nav-billing").classList.contains('active')) document.querySelector('.sticky-action-bar').style.transform = 'translateY(0)'; }
     });
-
-    // BACKUP
     function downloadBackup() { let b = new Blob([JSON.stringify({db:localStorage.getItem("shopDB"), h:localStorage.getItem("billHistory")})], {type:"application/json"}); let a = document.createElement("a"); a.href=URL.createObjectURL(b); a.download="tirupati_backup_"+Date.now()+".json"; a.click(); }
     function restoreBackup(i) { let r = new FileReader(); r.onload = e => { let d = JSON.parse(e.target.result); if(d.db) localStorage.setItem("shopDB", d.db); if(d.h) localStorage.setItem("billHistory", d.h); alert("Restored!"); location.reload(); }; r.readAsText(i.files[0]); }
-
-    document.querySelectorAll('.form-control').forEach((input, index, inputs) => {
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); const next = inputs[index + 1]; if(next) next.focus(); }
-        });
-    });
-
+    document.querySelectorAll('.form-control').forEach((input, index, inputs) => { input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const next = inputs[index + 1]; if(next) next.focus(); } }); });
     window.onload = function() { document.getElementById("bill-date").innerText = new Date().toLocaleDateString(); calculateStats(); }
 </script>
 </body>
