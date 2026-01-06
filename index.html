@@ -71,14 +71,10 @@
         .receipt-table th { border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 0.75rem; color: #666; }
         .receipt-table td { padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; vertical-align: middle; }
 
-        /* HISTORY CARD DESIGN (TOUCH OPTIMIZED) */
+        /* HISTORY CARD DESIGN */
         .history-card {
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 15px; 
-            margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            border-left: 5px solid transparent;
+            background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02); border-left: 5px solid transparent;
         }
         .history-card.is-udhaar { border-left-color: #dc3545; background: var(--udhaar-bg); }
         .history-card.is-paid { border-left-color: #198754; background: var(--paid-bg); }
@@ -178,7 +174,7 @@
                 <div class="col-6"><input type="number" id="boxPrice" class="form-control" placeholder="Price"></div>
                 <div class="col-6">
                     <div class="d-flex gap-2">
-                        <input type="number" id="boxQty" class="form-control" value="1" placeholder="Qty">
+                        <input type="number" id="boxQty" class="form-control" value="1" placeholder="Qty" step="0.01">
                         <button class="btn btn-primary rounded-3 px-3 w-50 shadow-sm" onclick="addToBill()"><i class="bi bi-plus-lg fs-4"></i></button>
                     </div>
                 </div>
@@ -355,9 +351,17 @@
         if(p) { document.getElementById("boxName").value = p.name; document.getElementById("boxPrice").value = p.price; }
     }
     function addToBill() {
-        buzz(); let n = document.getElementById("boxName").value, p = parseFloat(document.getElementById("boxPrice").value), q = parseInt(document.getElementById("boxQty").value);
+        buzz(); 
+        let n = document.getElementById("boxName").value;
+        let p = parseFloat(document.getElementById("boxPrice").value);
+        let q = parseFloat(document.getElementById("boxQty").value); // Float for decimal
+        
         if(!n || isNaN(p) || isNaN(q)) { document.getElementById("boxName").focus(); return; }
-        currentBill.push({ name: n, price: p, qty: q, total: p*q });
+        
+        // Round total to 2 decimals
+        let total = parseFloat((p * q).toFixed(2));
+        
+        currentBill.push({ name: n, price: p, qty: q, total: total });
         renderBill();
         document.getElementById("boxName").value=""; document.getElementById("boxPrice").value=""; document.getElementById("boxBarcode").value=""; document.getElementById("boxQty").value="1";
         document.getElementById("boxBarcode").focus();
@@ -371,10 +375,21 @@
             sub += i.total;
             tbody.innerHTML += `<tr><td class="py-2">${i.name}</td><td class="text-center">${i.qty}</td><td class="text-end">₹${i.total}</td><td class="action-col text-end"><i class="bi bi-x-circle-fill text-danger fs-4" onclick="remItem(${idx})"></i></td></tr>`;
         });
+        
+        // Ensure subtotal is 2 decimal
+        sub = parseFloat(sub.toFixed(2));
+        
         let discInput = parseFloat(document.getElementById("discountVal").value) || 0;
         let type = document.getElementById("discountType").value;
-        let discAmt = type === 'flat' ? discInput : Math.round((sub * discInput) / 100);
-        document.getElementById("bill-subtotal").innerText = sub; document.getElementById("bill-total").innerText = sub - discAmt; document.getElementById("bill-disc-display").innerText = discAmt;
+        let discAmt = type === 'flat' ? discInput : (sub * discInput) / 100;
+        
+        // Rounding
+        discAmt = parseFloat(discAmt.toFixed(2));
+        let total = parseFloat((sub - discAmt).toFixed(2));
+        
+        document.getElementById("bill-subtotal").innerText = sub; 
+        document.getElementById("bill-total").innerText = total; 
+        document.getElementById("bill-disc-display").innerText = discAmt;
         document.getElementById("row-discount").classList.toggle("hidden", !document.getElementById("showDiscountToggle").checked);
     }
     function remItem(i) { currentBill.splice(i,1); renderBill(); }
@@ -430,10 +445,10 @@
 
     function calculateStats() {
         let h = JSON.parse(localStorage.getItem("billHistory")) || [], today = new Date().toLocaleDateString();
-        document.getElementById("stat-today").innerText = h.filter(x => x.date === today).reduce((a, b) => a + (parseFloat(b.amt) || 0), 0);
+        document.getElementById("stat-today").innerText = h.filter(x => x.date === today).reduce((a, b) => a + (parseFloat(b.amt) || 0), 0).toFixed(2);
         let totalPending = h.reduce((a, b) => a + (parseFloat(b.pending) || (b.mode === 'Udhaar' ? parseFloat(b.amt) : 0)), 0);
-        document.getElementById("stat-pending").innerText = totalPending;
-        document.getElementById("hist-total-pending").innerText = `Pending: ₹${totalPending}`;
+        document.getElementById("stat-pending").innerText = totalPending.toFixed(2);
+        document.getElementById("hist-total-pending").innerText = `Pending: ₹${totalPending.toFixed(2)}`;
     }
 
     // --- NEW HISTORY LOGIC ---
@@ -450,13 +465,10 @@
         l.innerHTML = "";
         
         h.slice().reverse().forEach((x, index) => {
-            // Smart Filter
             let pending = parseFloat(x.pending) || (x.mode === 'Udhaar' ? parseFloat(x.amt) : 0);
             let isPaid = pending <= 0;
             
-            // 1. Check Search
             if(search && !x.cust.toLowerCase().includes(search) && !x.date.includes(search)) return;
-            // 2. Check Filter Button
             if(histFilter === 'pending' && isPaid) return;
             if(histFilter === 'paid' && !isPaid) return;
 
