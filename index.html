@@ -4,26 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>Tirupati Pro</title>
+    <title>Tirupati Udhaar Pro</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <style>
-        /* === NATIVE ANDROID FEEL === */
-        :root { --app-primary: #0d6efd; --app-bg: #f2f4f8; }
-        
-        * { -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--app-bg); 
-            padding-bottom: 150px; /* Space for scrolling */
-            user-select: none;
-            overscroll-behavior-y: none; /* No pull-to-refresh */
+        /* === THEME VARIABLES === */
+        :root {
+            --app-bg: #f2f4f8; --card-bg: #ffffff; --text-main: #000000;
+            --text-sub: #6c757d; --input-bg: #f8f9fa; --input-border: #eee;
+            --nav-bg: #ffffff;
+        }
+        [data-bs-theme="dark"] {
+            --app-bg: #121212; --card-bg: #1e1e1e; --text-main: #e0e0e0;
+            --text-sub: #adb5bd; --input-bg: #2c2c2c; --input-border: #444;
+            --nav-bg: #1e1e1e;
         }
 
+        * { -webkit-tap-highlight-color: transparent; outline: none; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--app-bg); color: var(--text-main);
+            padding-bottom: 150px; user-select: none; overscroll-behavior-y: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
         .hidden { display: none !important; }
 
         /* LOADING POPUP */
@@ -32,67 +38,69 @@
             background: rgba(0,0,0,0.9); z-index: 9999;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
             color: white; text-align: center; backdrop-filter: blur(4px);
-            transition: opacity 0.2s;
         }
 
         /* HEADER */
         .app-header {
-            background: white; padding: 10px 15px; 
-            position: sticky; top: 0; z-index: 1020; 
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            background: var(--nav-bg); padding: 10px 15px; position: sticky; top: 0; z-index: 1020; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 5px rgba(0,0,0,0.1);
         }
 
         /* CARDS & INPUTS */
         .app-card {
-            background: white; border-radius: 16px; padding: 15px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02); margin-bottom: 10px; border: 1px solid #f0f0f0;
+            background: var(--card-bg); border-radius: 16px; padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 10px; border: 1px solid var(--input-border);
         }
-
         .form-control, .form-select { 
-            border-radius: 10px; background: #f8f9fa; border: 1px solid #eee; 
-            padding: 12px; font-size: 16px; /* Prevents iOS zoom */
+            border-radius: 10px; background: var(--input-bg); border: 1px solid var(--input-border); 
+            color: var(--text-main); padding: 12px; font-size: 16px; 
         }
-        .form-control:focus { background: white; border-color: var(--app-primary); box-shadow: none; }
-        
-        /* Auto-Capitalize Inputs */
+        .form-control:focus { background: var(--card-bg); border-color: #0d6efd; box-shadow: none; color: var(--text-main); }
         #custName, #boxName, #invName { text-transform: capitalize; }
 
         /* RECEIPT PREVIEW */
         .receipt-container {
-            background: white; padding: 15px; border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid #d63384; margin-top: 10px;
+            background: #ffffff !important; color: #000000 !important;
+            padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            border-top: 5px solid #d63384; margin-top: 10px;
         }
         .receipt-table th { border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 0.75rem; color: #666; }
         .receipt-table td { padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; vertical-align: middle; }
 
         /* BOTTOM NAV */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 65px;
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); height: 65px;
             display: flex; justify-content: space-around; align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1030;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1030;
             border-top-left-radius: 15px; border-top-right-radius: 15px;
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .nav-item-btn { border: none; background: none; display: flex; flex-direction: column; align-items: center; color: #adb5bd; font-size: 0.7rem; font-weight: 600; padding: 8px; flex: 1; }
-        .nav-item-btn.active { color: var(--app-primary); }
+        .nav-item-btn { border: none; background: none; display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 0.7rem; font-weight: 600; padding: 8px; flex: 1; }
+        .nav-item-btn.active { color: #0d6efd; }
         .nav-item-btn i { font-size: 1.4rem; margin-bottom: 2px; }
 
         /* ACTION BAR */
         .sticky-action-bar { 
             position: fixed; bottom: 75px; left: 0; right: 0; padding: 0 15px; z-index: 1025; pointer-events: none; 
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s;
         }
-        .action-btn-container { pointer-events: auto; background: white; padding: 8px; border-radius: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; gap: 10px; }
-        
+        .action-btn-container { 
+            pointer-events: auto; background: var(--nav-bg); padding: 8px; border-radius: 14px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; gap: 10px; border: 1px solid var(--input-border);
+        }
         .btn-success-app { 
             background: #25D366; border: none; font-weight: 700; color: white;
-            padding: 12px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-            border-radius: 12px;
+            padding: 12px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); border-radius: 12px;
         }
+
+        /* UDHAAR HISTORY ITEM */
+        .history-item {
+            background: var(--card-bg); border-bottom: 1px solid var(--input-border);
+            padding: 12px;
+        }
+        .badge-udhaar { background: #fee2e2; color: #dc3545; border: 1px solid #fecaca; }
+        .badge-paid { background: #d1e7dd; color: #198754; border: 1px solid #badbcc; }
         
-        /* TOUCH FEEDBACK ANIMATION */
-        .btn, .nav-item-btn, .app-card { transition: transform 0.05s; }
         .btn:active, .nav-item-btn:active { transform: scale(0.96); }
     </style>
 </head>
@@ -110,7 +118,7 @@
         <small class="text-muted" style="font-size: 0.75rem;">Dhanki</small>
     </div>
     <div class="d-flex gap-2">
-        <button class="btn btn-light btn-sm rounded-circle shadow-sm p-2" onclick="toggleTheme()"><i class="bi bi-circle-half"></i></button>
+        <button class="btn btn-sm rounded-circle shadow-sm p-2" style="background: var(--input-bg); color: var(--text-main);" onclick="toggleTheme()"><i class="bi bi-circle-half"></i></button>
         <button class="btn btn-primary btn-sm rounded-pill fw-bold shadow-sm px-3" onclick="toggleLanguage()"><span id="lang-text">A/अ</span></button>
     </div>
 </div>
@@ -119,9 +127,8 @@
 
     <div id="dashboard-view">
         <div class="row g-2 mb-3">
-            <div class="col-4"><div class="app-card text-center h-100 py-3"><h4 class="fw-bold text-success mb-0">₹<span id="stat-today">0</span></h4><small class="text-muted" style="font-size:0.65rem" data-key="stat_today">Today</small></div></div>
-            <div class="col-4"><div class="app-card text-center h-100 py-3"><h4 class="fw-bold text-danger mb-0">₹<span id="stat-pending">0</span></h4><small class="text-muted" style="font-size:0.65rem" data-key="stat_pending">Pending</small></div></div>
-            <div class="col-4"><div class="app-card text-center h-100 py-3"><h4 class="fw-bold text-warning mb-0"><span id="stat-low">0</span></h4><small class="text-muted" style="font-size:0.65rem" data-key="stat_low">Low Stk</small></div></div>
+            <div class="col-6"><div class="app-card text-center h-100 py-4"><h3 class="fw-bold text-success mb-0">₹<span id="stat-today">0</span></h3><small class="text-muted" data-key="stat_today">Today's Sale</small></div></div>
+            <div class="col-6"><div class="app-card text-center h-100 py-4"><h3 class="fw-bold text-danger mb-0">₹<span id="stat-pending">0</span></h3><small class="text-muted" data-key="stat_pending">Total Pending</small></div></div>
         </div>
         
         <div class="app-card p-3">
@@ -143,14 +150,14 @@
                     <input type="text" id="custName" class="form-control fw-bold" placeholder="Name" oninput="updateBillPreview()">
                 </div>
                 <div class="col-5">
-                    <input type="tel" id="custPhone" class="form-control" placeholder="Mobile (10)" maxlength="10">
+                    <input type="tel" id="custPhone" class="form-control" placeholder="Mobile" maxlength="10">
                 </div>
             </div>
             
-            <select id="paymentMode" class="form-select fw-bold bg-white mb-3 text-secondary" onchange="updateBillPreview()">
+            <select id="paymentMode" class="form-select fw-bold mb-3 text-secondary" onchange="updateBillPreview()">
                 <option value="Cash" data-key="opt_cash">Cash</option>
                 <option value="Online" data-key="opt_online">Online</option>
-                <option value="Udhaar" data-key="opt_udhaar">Udhaar</option>
+                <option value="Udhaar" data-key="opt_udhaar">Udhaar (Credit)</option>
             </select>
 
             <div class="row g-2">
@@ -176,7 +183,7 @@
             <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top gap-2">
                 <div class="input-group input-group-sm w-50">
                     <input type="number" id="discountVal" class="form-control border-end-0" placeholder="Disc" oninput="renderBill()">
-                    <select id="discountType" class="form-select bg-light border-start-0 text-muted" style="max-width: 60px;" onchange="renderBill()">
+                    <select id="discountType" class="form-select border-start-0" style="max-width: 60px;" onchange="renderBill()">
                         <option value="flat">₹</option>
                         <option value="percent">%</option>
                     </select>
@@ -233,22 +240,28 @@
             <div class="row g-2">
                 <div class="col-8"><input type="text" id="invName" class="form-control" placeholder="Item Name"></div>
                 <div class="col-4"><input type="text" id="invBarcode" class="form-control" placeholder="Code"></div>
-                <div class="col-6"><input type="number" id="invPrice" class="form-control" placeholder="Price"></div>
-                <div class="col-6"><input type="number" id="invStock" class="form-control" placeholder="Stock"></div>
-                <div class="col-12"><button class="btn btn-dark w-100 py-3 rounded-3 fw-bold shadow-sm" onclick="saveToDB()" data-key="btn_save_prod">Save</button></div>
+                <div class="col-12">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">₹</span>
+                        <input type="number" id="invPrice" class="form-control border-start-0" placeholder="Price">
+                        <button class="btn btn-dark fw-bold px-4" onclick="saveToDB()" data-key="btn_save_prod">Save</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <input type="text" id="dbSearch" class="form-control mb-3 py-3 rounded-3 shadow-sm border-0" placeholder="Search..." oninput="renderDB()">
+        <input type="text" id="dbSearch" class="form-control mb-3 py-3 rounded-3 shadow-sm border-0" placeholder="Search products..." oninput="renderDB()">
         <div id="db-list" class="pb-5"></div>
     </div>
 
     <div id="history-view" class="hidden">
         <h5 class="mb-3 ps-2 fw-bold" data-key="title_history">Sales History</h5>
-        <div class="bg-white p-1 rounded-3 shadow-sm d-flex mb-3 border">
-            <button class="btn btn-sm flex-fill rounded-2 btn-dark py-2" onclick="filterHistory('all')" id="btn-hist-all" data-key="filter_all">All</button>
-            <button class="btn btn-sm flex-fill rounded-2 btn-light text-danger py-2" onclick="filterHistory('Udhaar')" id="btn-hist-pending" data-key="filter_pending">Pending</button>
+        
+        <div class="input-group mb-3 shadow-sm rounded-3">
+            <span class="input-group-text border-0 bg-white"><i class="bi bi-search"></i></span>
+            <input type="text" id="histSearch" class="form-control border-0 p-3" placeholder="Search Name or Date..." oninput="renderHistory()">
         </div>
-        <ul id="history-list" class="list-group list-group-flush rounded-3 shadow-sm bg-white"></ul>
+
+        <ul id="history-list" class="list-group list-group-flush rounded-3 shadow-sm"></ul>
     </div>
 
 </div>
@@ -266,7 +279,7 @@
 <div class="bottom-nav" id="bottomNav">
     <button class="nav-item-btn active" onclick="switchTab('dashboard')" id="nav-dashboard"><i class="bi bi-grid-fill"></i> <span data-key="tab_dash">Dash</span></button>
     <button class="nav-item-btn" onclick="switchTab('billing')" id="nav-billing"><i class="bi bi-receipt"></i> <span data-key="tab_billing">Billing</span></button>
-    <button class="nav-item-btn" onclick="switchTab('stock')" id="nav-stock"><i class="bi bi-box-seam-fill"></i> <span data-key="tab_stock">Stock</span></button>
+    <button class="nav-item-btn" onclick="switchTab('stock')" id="nav-stock"><i class="bi bi-tag-fill"></i> <span data-key="tab_stock">Stock</span></button>
     <button class="nav-item-btn" onclick="switchTab('history')" id="nav-history"><i class="bi bi-clock-history"></i> <span data-key="tab_hist">History</span></button>
 </div>
 
@@ -278,28 +291,28 @@
     let currentLang = 'en';
     const t = {
         en: {
-            app_title: "Tirupati Collection", tab_dash:"Dash", tab_billing: "Billing", tab_stock: "Stock", tab_hist:"History",
-            stat_today: "Today", stat_pending: "Pending", stat_low: "Low Stk",
+            app_title: "Tirupati Collection", tab_dash:"Dash", tab_billing: "Billing", tab_stock: "Products", tab_hist:"History",
+            stat_today: "Today's Sale", stat_pending: "Total Pending", 
             btn_backup: "Backup", btn_restore: "Restore", btn_save_share: "Save & Share", btn_save_prod: "Save",
             ph_cust: "Customer Name", lbl_item: "Item Name", lbl_price: "Price", lbl_qty: "Qty",
             title_manage_db: "Add Product", lbl_disc: "Disc", lbl_show: "Show",
             shop_name: "TIRUPATI COLLECTION", shop_addr: "Old Bus Stand, Dhanki", footer_msg: "Thank You! Visit Again.",
             th_item: "ITEM", th_qty: "QTY", th_amt: "AMT", total: "TOTAL", lbl_subtotal: "Subtotal:", lbl_discount: "Discount:",
             opt_cash: "Cash", opt_online: "Online", opt_udhaar: "Udhaar",
-            title_history: "Sales History", filter_all: "All", filter_pending: "Pending", data_safe: "Data Safety",
+            title_history: "Sales History", data_safe: "Data Safety",
             pop_gen: "Generating Bill...", sys_pop: "✅ BILL COPIED!\n\n1. WhatsApp will open.\n2. Long Press & PASTE.",
             pop_copy: "Bill Copied!", pop_redir: "Opening WhatsApp..."
         },
         mr: {
-            app_title: "तिरुपती कलेक्शन", tab_dash:"डॅशबोर्ड", tab_billing: "बिलिंग", tab_stock: "स्टॉक", tab_hist:"इतिहास",
-            stat_today: "आजची विक्री", stat_pending: "उधारी", stat_low: "कमी स्टॉक",
+            app_title: "तिरुपती कलेक्शन", tab_dash:"डॅशबोर्ड", tab_billing: "बिलिंग", tab_stock: "वस्तू", tab_hist:"इतिहास",
+            stat_today: "आजची विक्री", stat_pending: "एकूण उधारी", 
             btn_backup: "बॅकअप", btn_restore: "रिस्टोर", btn_save_share: "सेव्ह & शेअर", btn_save_prod: "वस्तू सेव्ह करा",
             ph_cust: "ग्राहकाचे नाव", lbl_item: "वस्तूचे नाव", lbl_price: "किंमत", lbl_qty: "नग",
             title_manage_db: "नवीन वस्तू", lbl_disc: "सवलत", lbl_show: "दाखवा",
             shop_name: "तिरुपती कलेक्शन", shop_addr: "जुने बस स्टँड, ढाणकी", footer_msg: "धन्यवाद! पुन्हा भेट द्या.",
             th_item: "वस्तू", th_qty: "नग", th_amt: "रक्कम", total: "एकूण", lbl_subtotal: "उप-एकूण:", lbl_discount: "सवलत:",
             opt_cash: "रोख (Cash)", opt_online: "ऑनलाईन", opt_udhaar: "उधारी",
-            title_history: "विक्री इतिहास", filter_all: "सर्व", filter_pending: "बाकी", data_safe: "डेटा सुरक्षा",
+            title_history: "विक्री इतिहास", data_safe: "डेटा सुरक्षा",
             pop_gen: "बिल बनवत आहे...", sys_pop: "✅ बिल कॉपी झाले!\n\n1. WhatsApp उघडेल.\n2. तिथे पेस्ट (Paste) करा.",
             pop_copy: "बिल कॉपी झाले!", pop_redir: "WhatsApp उघडत आहे..."
         }
@@ -317,25 +330,28 @@
         document.getElementById("boxName").placeholder = t[currentLang]["lbl_item"];
         document.getElementById("boxPrice").placeholder = t[currentLang]["lbl_price"];
         document.getElementById("boxQty").placeholder = t[currentLang]["lbl_qty"];
-        renderBill(); renderDB();
+        renderBill(); renderDB(); renderHistory();
     }
     function toggleTheme() {
         buzz();
         let html = document.documentElement;
-        html.setAttribute('data-bs-theme', html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark');
+        let isDark = html.getAttribute('data-bs-theme') === 'dark';
+        html.setAttribute('data-bs-theme', isDark ? 'light' : 'dark');
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#f2f4f8' : '#121212');
     }
 
     // --- LOGIC ---
     function getDB() { return JSON.parse(localStorage.getItem("shopDB")) || []; }
     function saveToDB() {
         buzz();
-        let c = document.getElementById("invBarcode").value, n = document.getElementById("invName").value, p = document.getElementById("invPrice").value, s = document.getElementById("invStock").value;
+        let c = document.getElementById("invBarcode").value, n = document.getElementById("invName").value, p = document.getElementById("invPrice").value;
         if(!n) return alert("Name Required!");
         let db = getDB(), idx = db.findIndex(x => x.code == c && c != "");
-        let item = { code: c || "NOCODE", name: n, price: p, stock: s || 0 };
+        // STOCK REMOVED - Defaulting to 100 for legacy compatibility
+        let item = { code: c || "NOCODE", name: n, price: p, stock: 100 };
         if(idx > -1) db[idx] = item; else db.push(item);
         localStorage.setItem("shopDB", JSON.stringify(db));
-        renderDB(); calculateStats(); alert(currentLang === 'en' ? "Saved!" : "सेव्ह झाले!");
+        renderDB(); alert(currentLang === 'en' ? "Saved!" : "सेव्ह झाले!");
         document.getElementById("invBarcode").value=""; document.getElementById("invName").value="";
     }
     function renderDB() {
@@ -343,14 +359,13 @@
         list.innerHTML = "";
         db.forEach((item, index) => {
             if(item.name.toLowerCase().includes(search) || item.code.toString().includes(search)) {
-                let isLow = parseInt(item.stock) < 5;
                 list.innerHTML += `
-                <div class="app-card ${isLow?'border-start border-danger border-4':''} p-3 mb-2">
-                    <div class="d-flex justify-content-between">
-                        <div><div class="fw-bold">${item.name}</div><span class="small text-muted">${item.code}</span></div>
-                        <div class="text-end"><div class="fw-bold text-success">₹${item.price}</div><span class="badge ${isLow?'bg-danger':'bg-secondary'}">Stk: ${item.stock}</span></div>
+                <div class="app-card p-3 mb-2 d-flex justify-content-between align-items-center">
+                    <div><div class="fw-bold">${item.name}</div><span class="small text-muted">${item.code}</span></div>
+                    <div class="text-end">
+                        <div class="fw-bold text-success fs-5">₹${item.price}</div>
+                        <small class="text-primary fw-bold cursor-pointer" onclick="editItem(${index})">EDIT</small>
                     </div>
-                    <div class="text-end mt-2"><small class="text-primary fw-bold" onclick="editItem(${index})">EDIT</small></div>
                 </div>`;
             }
         });
@@ -370,10 +385,8 @@
         if(!n || isNaN(p) || isNaN(q)) { document.getElementById("boxName").focus(); return; }
         currentBill.push({ name: n, price: p, qty: q, total: p*q });
         renderBill();
-        // Reset Inputs
         document.getElementById("boxName").value=""; document.getElementById("boxPrice").value=""; 
         document.getElementById("boxBarcode").value=""; document.getElementById("boxQty").value="1";
-        // Refocus for speed
         document.getElementById("boxBarcode").focus();
     }
     function renderBill() {
@@ -400,39 +413,46 @@
     function remItem(i) { currentBill.splice(i,1); renderBill(); }
     function updateBillPreview() { renderBill(); }
 
-    // --- ULTIMATE SHARE LOGIC ---
+    // --- SHARE LOGIC ---
     async function saveAndShare() {
         buzz();
         if(!currentBill.length) return alert("Bill Empty!");
         
-        // 1. SAVE DATA
         let h = JSON.parse(localStorage.getItem("billHistory")) || [];
         let finalAmt = parseFloat(document.getElementById("bill-total").innerText) || 0;
         let custName = document.getElementById("custName").value || "Customer";
         let custPhone = document.getElementById("custPhone").value.replace(/\D/g, "") || ""; 
+        let mode = document.getElementById("paymentMode").value;
+
+        // Pending Amount Logic (If Udhaar, pending = full amt, else 0)
+        let pendingAmt = mode === 'Udhaar' ? finalAmt : 0;
         
-        h.push({ date: new Date().toLocaleDateString(), cust: custName, phone: custPhone, amt: finalAmt, mode: document.getElementById("paymentMode").value });
-        let db = getDB();
-        currentBill.forEach(b => { let f = db.find(x => x.name === b.name); if(f) f.stock -= b.qty; });
-        localStorage.setItem("shopDB", JSON.stringify(db)); localStorage.setItem("billHistory", JSON.stringify(h));
+        h.push({ 
+            id: Date.now(),
+            date: new Date().toLocaleDateString(), 
+            cust: custName, 
+            phone: custPhone, 
+            amt: finalAmt, 
+            mode: mode,
+            pending: pendingAmt 
+        });
+        
+        localStorage.setItem("billHistory", JSON.stringify(h));
         calculateStats();
 
-        // 2. SHOW OVERLAY
-        let overlay = document.getElementById("loadingOverlay"), title = document.getElementById("popupTitle"), sub = document.getElementById("popupSub");
+        let overlay = document.getElementById("loadingOverlay"), title = document.getElementById("popupTitle");
         overlay.classList.remove("hidden");
-        title.innerText = t[currentLang]["pop_gen"]; sub.innerText = "Please wait...";
+        title.innerText = t[currentLang]["pop_gen"];
 
-        // 3. GENERATE
         document.querySelectorAll('.action-col').forEach(e => e.style.display='none');
         setTimeout(async () => {
             try {
                 let cvs = await html2canvas(document.getElementById("receipt-area"), { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
                 cvs.toBlob(async (blob) => {
-                    let msgText = currentLang === 'en' ? `Hello ${custName}, here is your bill of ₹${finalAmt}.` : `नमस्कार ${custName}, तुमचे ₹${finalAmt} चे बिल. - तिरुपती कलेक्शन`;
+                    let msgText = currentLang === 'mr' ? `नमस्कार ${custName}, तुमचे ₹${finalAmt} चे बिल तयार आहे. - तिरुपती कलेक्शन` : `Hello ${custName}, here is your bill of ₹${finalAmt} from Tirupati Collection.`;
                     let msg = encodeURIComponent(msgText);
                     let isCopied = false;
 
-                    // 4. ATTEMPT COPY
                     try {
                         if (navigator.permissions) try { await navigator.permissions.query({name: "clipboard-write"}); } catch(e){}
                         await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
@@ -442,15 +462,12 @@
                         isCopied = false;
                         let link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Bill_${custName}.png`; link.click();
                         title.innerText = "⚠️ Android Blocked Copy";
-                        sub.innerText = "Image Downloaded.";
                     }
 
-                    // 5. REDIRECT
                     setTimeout(() => {
                         overlay.classList.add("hidden");
                         if(custPhone) {
-                            if(isCopied) alert(t[currentLang]["sys_pop"]); // System Alert
-                            else alert(currentLang==='en'?"Image Downloaded. Attach in WhatsApp.":"फोटो डाउनलोड झाला. WhatsApp मध्ये जोडा.");
+                            if(isCopied) alert(t[currentLang]["sys_pop"]); else alert("Image Downloaded. Attach in WhatsApp.");
                             window.location.href = `https://wa.me/91${custPhone}?text=${msg}`;
                         } else if(navigator.share) {
                              let file = new File([blob], "bill.png", {type:"image/png"});
@@ -470,36 +487,75 @@
     function clearBillUI() { currentBill = []; document.getElementById("custName").value = ""; document.getElementById("custPhone").value = ""; document.getElementById("discountVal").value = ""; renderBill(); }
 
     function calculateStats() {
-        let h = JSON.parse(localStorage.getItem("billHistory")) || [], db = getDB(), today = new Date().toLocaleDateString();
+        let h = JSON.parse(localStorage.getItem("billHistory")) || [], today = new Date().toLocaleDateString();
+        // Today Sale = Sum of 'amt' for today
         document.getElementById("stat-today").innerText = h.filter(x => x.date === today).reduce((a, b) => a + (parseFloat(b.amt) || 0), 0);
-        document.getElementById("stat-pending").innerText = h.filter(x => x.mode === 'Udhaar').reduce((a, b) => a + (parseFloat(b.amt) || 0), 0);
-        document.getElementById("stat-low").innerText = db.filter(x => x.stock < 5).length;
+        // Pending = Sum of 'pending' (Using new field for accuracy)
+        let totalPending = h.reduce((a, b) => a + (parseFloat(b.pending) || (b.mode === 'Udhaar' ? parseFloat(b.amt) : 0)), 0);
+        document.getElementById("stat-pending").innerText = totalPending;
     }
     
-    // HISTORY PHONE LINK
-    function filterHistory(m) {
+    // SMART HISTORY
+    function renderHistory() {
         let l = document.getElementById("history-list"), h = JSON.parse(localStorage.getItem("billHistory"))||[];
+        let search = document.getElementById("histSearch").value.toLowerCase();
         l.innerHTML = "";
-        document.getElementById("btn-hist-all").classList.toggle("btn-dark", m==='all'); document.getElementById("btn-hist-all").classList.toggle("btn-light", m!=='all');
-        document.getElementById("btn-hist-pending").classList.toggle("btn-danger", m!=='all'); document.getElementById("btn-hist-pending").classList.toggle("btn-light", m==='all');
-        h.slice().reverse().filter(x => m==='all' || x.mode===m).forEach(x => {
-            let bColor = x.mode === 'Udhaar' ? 'bg-danger' : 'bg-success';
-            let phoneLink = x.phone ? `<a href="tel:${x.phone}" class="text-decoration-none small text-muted ms-2"><i class="bi bi-telephone-fill"></i> ${x.phone}</a>` : '';
+        
+        h.slice().reverse().forEach((x, index) => {
+            // Filter Logic
+            if(search && !x.cust.toLowerCase().includes(search) && !x.date.includes(search)) return;
+
+            let realIndex = h.length - 1 - index; // Correct index for reverse list
+            let pending = parseFloat(x.pending) || (x.mode === 'Udhaar' ? parseFloat(x.amt) : 0);
+            let isPaid = pending <= 0;
+            let statusBadge = isPaid ? `<span class="badge badge-paid">PAID</span>` : `<span class="badge badge-udhaar">PENDING ₹${pending}</span>`;
+            let phoneLink = x.phone ? `<a href="tel:${x.phone}" class="text-decoration-none small text-muted ms-2"><i class="bi bi-telephone-fill"></i></a>` : '';
+            
+            // PAY BUTTON (Only if Pending > 0)
+            let payBtn = !isPaid ? `<button class="btn btn-sm btn-outline-success ms-2 fw-bold" onclick="settleBill(${realIndex})">PAY</button>` : '';
+
             l.innerHTML += `
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="history-item d-flex justify-content-between align-items-center">
                 <div>
                     <div class="fw-bold">${x.cust || 'Unknown'} ${phoneLink}</div>
-                    <small class="text-muted">${x.date}</small>
-                    <div class="mt-1"><span class="badge ${bColor}">${x.mode}</span></div>
+                    <small style="color: var(--text-sub)">${x.date} • ₹${x.amt}</small>
+                    <div class="mt-1">${statusBadge}</div>
                 </div>
-                <div class="fw-bold fs-5">₹${x.amt}</div>
-            </li>`;
+                <div class="d-flex align-items-center">
+                    ${payBtn}
+                </div>
+            </div>`;
         });
+    }
+
+    // SETTLE UDHAAR
+    function settleBill(index) {
+        buzz();
+        let h = JSON.parse(localStorage.getItem("billHistory"));
+        let item = h[index];
+        let currentPending = parseFloat(item.pending) || parseFloat(item.amt);
+        
+        let payAmt = prompt(`Pending: ₹${currentPending}\nEnter Amount Received:`, currentPending);
+        if(payAmt === null) return;
+        
+        let payVal = parseFloat(payAmt);
+        if(isNaN(payVal) || payVal <= 0) return alert("Invalid Amount");
+        
+        // Update Pending
+        item.pending = currentPending - payVal;
+        if(item.pending < 0) item.pending = 0;
+        
+        // Update Mode if fully paid
+        if(item.pending === 0) item.mode = 'Cash'; 
+        
+        h[index] = item;
+        localStorage.setItem("billHistory", JSON.stringify(h));
+        calculateStats(); renderHistory();
     }
     
     function editItem(i) {
         let item = getDB()[i]; document.getElementById("invBarcode").value = item.code; document.getElementById("invName").value = item.name;
-        document.getElementById("invPrice").value = item.price; document.getElementById("invStock").value = item.stock;
+        document.getElementById("invPrice").value = item.price; 
         window.scrollTo(0,0); switchTab('stock');
     }
     function switchTab(t) {
@@ -507,10 +563,10 @@
         document.querySelectorAll('[id$="-view"]').forEach(e => e.classList.add('hidden')); document.getElementById(t+"-view").classList.remove('hidden');
         document.querySelectorAll('.nav-item-btn').forEach(e => e.classList.remove('active')); document.getElementById("nav-"+t).classList.add('active');
         if(t === 'billing') document.getElementById('billing-actions').classList.remove('hidden'); else document.getElementById('billing-actions').classList.add('hidden');
-        if(t==='stock') renderDB(); if(t==='history') filterHistory('all'); if(t==='dashboard') calculateStats();
+        if(t==='stock') renderDB(); if(t==='history') renderHistory(); if(t==='dashboard') calculateStats();
     }
     
-    // KEYBOARD HANDLING (Auto Hide Footer)
+    // KEYBOARD HANDLING
     const originalHeight = window.innerHeight;
     window.addEventListener('resize', () => {
         if(window.innerHeight < originalHeight - 150) {
@@ -526,14 +582,9 @@
     function downloadBackup() { let b = new Blob([JSON.stringify({db:localStorage.getItem("shopDB"), h:localStorage.getItem("billHistory")})], {type:"application/json"}); let a = document.createElement("a"); a.href=URL.createObjectURL(b); a.download="tirupati_backup_"+Date.now()+".json"; a.click(); }
     function restoreBackup(i) { let r = new FileReader(); r.onload = e => { let d = JSON.parse(e.target.result); if(d.db) localStorage.setItem("shopDB", d.db); if(d.h) localStorage.setItem("billHistory", d.h); alert("Restored!"); location.reload(); }; r.readAsText(i.files[0]); }
 
-    // AUTO NEXT INPUT
     document.querySelectorAll('.form-control').forEach((input, index, inputs) => {
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const nextInput = inputs[index + 1];
-                if (nextInput) nextInput.focus();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); const next = inputs[index + 1]; if(next) next.focus(); }
         });
     });
 
